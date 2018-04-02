@@ -4,7 +4,12 @@
     <meta charset="utf-8">
     <title>Test</title>
     <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="stylesheet" type="text/css" href="/css/joint.min.css">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.10.1/lodash.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.3.3/backbone.js"></script>
+    <script src="/js/joint.min.js"></script>
   </head>
   <body>
     <div class="container">
@@ -13,15 +18,76 @@
           <input name="city" type="text" class="ghost-input" placeholder="Enter a City" required>
           <input type="submit" class="ghost-button" value="Get Weather">
         </form>
-        <% if(weather !== null){ %>
-          <p><%= weather %></p>
+        <% if(locals.weather !== null){ %>
+          <p><%= locals.weather %></p>
         <% } %>
 
-        <% if(error !== null){ %>
-          <p><%= error %></p>
+        <% if(locals.error !== null){ %>
+          <p><%= locals.error %></p>
         <% } %>
 
       </fieldset>
     </div>
+    <div id="myholder"></div>
+    <div id="myholder-small"></div>
+    <script type="text/javascript">
+
+      toto = joint.shapes.basic.Generic.extend({
+        markup: '<g class="rotatable"><g class="scalable"><rect/></g><text/></g>',
+
+        defaults: joint.util.deepSupplement({
+            type: 'basic.Rect',
+            attrs: {
+                'rect': { fill: 'red', stroke: 'black', 'follow-scale': true, width: 80, height: 40, rx: 50, ry: 10 },
+                'text': { 'font-size': 14, 'ref-x': .5, 'ref-y': .5, ref: 'rect', 'y-alignment': 'middle', 'x-alignment': 'middle' }
+            }
+        }, joint.shapes.basic.Generic.prototype.defaults)
+      });
+
+
+      var graph = new joint.dia.Graph;
+
+      var paper = new joint.dia.Paper({
+        el: $('#myholder'),
+        width: 600,
+        height: 200,
+        model: graph,
+        gridsize: 1
+      });
+
+      var paperSmall = new joint.dia.Paper({
+        el: $('#myholder-small'),
+        width: 600,
+        height: 100,
+        model: graph,
+        gridsize: 1
+      });
+
+      paperSmall.scale(.5);
+      paperSmall.$el.css('pointer-events', 'none');
+
+      var rect = new toto({
+        position: {x: 100, y: 30},
+        size: {width: 100, height: 30},
+        attrs: {text: { text: 'my box', fill: 'white'}}
+      });
+
+      var rect2 = rect.clone();
+      rect2.translate(300);
+
+      var link = new joint.dia.Link({
+        source: { id: rect.id },
+        target: { id: rect2.id }
+      })
+
+      link.attr({
+        '.connection': { stroke: 'blue' },
+        '.marker-target': { fill: 'yellow', d: 'M 10 0 L 0 5 L 10 10 z' }
+      });
+
+      graph.addCells([rect, rect2, link])
+
+
+    </script>
   </body>
 </html>
